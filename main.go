@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func multiplexer(res http.ResponseWriter, req *http.Request) bool {
+func multiplexer(res http.ResponseWriter, req *http.Request) {
 	secrets := LoadSecrets()
 
 	if req.URL.Path == ("/" + secrets.TELEGRAM_ID) {
@@ -16,10 +16,8 @@ func multiplexer(res http.ResponseWriter, req *http.Request) bool {
 
 		ScriptureBot.telegramHandler(res, req, secrets)
 
-		return true
+		return
 	}
-
-	return false
 }
 
 func main() {
