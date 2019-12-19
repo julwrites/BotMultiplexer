@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	botsecrets "github.com/julwrites/BotSecrets"
 	scripturebot "github.com/julwrites/ScriptureBot"
@@ -14,9 +15,9 @@ import (
 func multiplexer(res http.ResponseWriter, req *http.Request) {
 	secrets := botsecrets.LoadSecrets()
 
-	log.Printf("Url: %s", req.URL.EscapedPath())
+	log.Printf("URL: %s", req.URL.EscapedPath())
 
-	if req.URL.EscapedPath() == "/"+secrets.TELEGRAM_ID {
+	if strings.Compare(strings.Trim(req.URL.EscapedPath(), "\n"), strings.Trim("/"+secrets.TELEGRAM_ID, "\n")) == 0 {
 		log.Printf("Telegram message")
 
 		scripturebot.TelegramHandler(res, req, &secrets)
