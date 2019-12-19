@@ -7,16 +7,17 @@ import (
 	"net/http"
 	"os"
 
+	botsecrets "github.com/julwrites/BotSecrets"
 	scripturebot "github.com/julwrites/ScriptureBot"
 )
 
 func multiplexer(res http.ResponseWriter, req *http.Request) {
-	secrets := LoadSecrets()
+	secrets := botsecrets.LoadSecrets()
 
 	if req.URL.Path == ("/" + secrets.TELEGRAM_ID) {
 		log.Printf("Telegram message")
 
-		scripturebot.TelegramHandler(res, req, secrets)
+		scripturebot.TelegramHandler(res, req, &secrets)
 
 		return
 	}
