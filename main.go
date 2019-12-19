@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	scripturebot "github.com/julwrites/ScriptureBot"
 )
 
 func multiplexer(res http.ResponseWriter, req *http.Request) {
@@ -14,7 +16,7 @@ func multiplexer(res http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == ("/" + secrets.TELEGRAM_ID) {
 		log.Printf("Telegram message")
 
-		ScriptureBot.telegramHandler(res, req, secrets)
+		scripturebot.TelegramHandler(res, req, secrets)
 
 		return
 	}
