@@ -10,7 +10,7 @@ import (
 // Secrets handling for bot
 
 func LoadSecrets() SecretsData {
-	data, err := ioutil.ReadFile("secrets.yaml")
+	data, err := ioutil.ReadFile("~/secrets.yaml")
 	if err != nil {
 		log.Fatalf("Error reading secrets: %v", err)
 	}
