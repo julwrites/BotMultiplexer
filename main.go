@@ -1,4 +1,4 @@
-package BotMultiplexer
+package main
 
 // Translator methods
 import (
@@ -8,10 +8,23 @@ import (
 	"os"
 )
 
-func main() {
+func multiplexer(res http.ResponseWriter, req *http.Request) bool {
 	secrets := LoadSecrets()
 
-	http.HandleFunc("/"+secrets.TELEGRAM_ID, ScriptureBot.telegramHandler)
+	if req.URL.Path == ("/" + secrets.TELEGRAM_ID) {
+		log.Printf("Telegram message")
+
+		ScriptureBot.telegramHandler(res, req, secrets)
+
+		return true
+	}
+
+	return false
+}
+
+func main() {
+
+	http.HandleFunc("/", multiplexer)
 
 	port := os.Getenv("PORT")
 	if port == "" {

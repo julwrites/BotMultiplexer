@@ -1,4 +1,4 @@
-package BotMultiplexer
+package main
 
 type SecretsData struct {
 	TELEGRAM_ID string
