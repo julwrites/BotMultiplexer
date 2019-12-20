@@ -13,7 +13,7 @@ import (
 )
 
 func multiplexer(res http.ResponseWriter, req *http.Request) {
-	secrets := botsecrets.LoadSecrets()
+	secrets := botsecrets.LoadSecrets("~/secrets.yaml")
 
 	log.Printf("URL: %s", req.URL.EscapedPath())
 	log.Printf("Telegram: %s", "/"+secrets.TELEGRAM_ID)
@@ -28,7 +28,6 @@ func multiplexer(res http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-
 	http.HandleFunc("/", multiplexer)
 
 	port := os.Getenv("PORT")
