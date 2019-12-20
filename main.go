@@ -16,6 +16,7 @@ func multiplexer(res http.ResponseWriter, req *http.Request) {
 	secrets := botsecrets.LoadSecrets()
 
 	log.Printf("URL: %s", req.URL.EscapedPath())
+	log.Printf("Telegram: %s", "/"+secrets.TELEGRAM_ID)
 
 	if strings.Compare(strings.Trim(req.URL.EscapedPath(), "\n"), strings.Trim("/"+secrets.TELEGRAM_ID, "\n")) == 0 {
 		log.Printf("Telegram message")
