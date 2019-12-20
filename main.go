@@ -14,7 +14,7 @@ import (
 )
 
 func multiplexer(res http.ResponseWriter, req *http.Request) {
-	secretsPath, _ := filepath.Abs("~/secrets.yaml")
+	secretsPath, _ := filepath.Abs("./secrets.yaml")
 	secrets := botsecrets.LoadSecrets(secretsPath)
 
 	log.Printf("URL: %s", req.URL.EscapedPath())
