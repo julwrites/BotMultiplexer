@@ -17,15 +17,12 @@ func multiplexer(res http.ResponseWriter, req *http.Request) {
 	secretsPath, _ := filepath.Abs("./secrets.yaml")
 	secrets := botsecrets.LoadSecrets(secretsPath)
 
-	log.Printf("URL: %s", req.URL.EscapedPath())
-
-	log.Printf("Telegram: %s", "/"+secrets.TELEGRAM_ID)
-	if strings.Compare(strings.Trim(req.URL.EscapedPath(), "\n"), strings.Trim("/"+secrets.TELEGRAM_ID, "\n")) == 0 {
+	switch strings.Trim(req.URL.EscapedPath(), "\n") {
+	case strings.Trim("/"+secrets.TELEGRAM_ID, "\n"):
 		log.Printf("Incoming telegram message")
-
 		scripturebot.TelegramHandler(res, req, &secrets)
-
-		return
+	default:
+		log.Fatalf("No appropriate handler")
 	}
 }
 
