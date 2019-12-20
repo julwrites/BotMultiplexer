@@ -1,4 +1,5 @@
-echo Deploying from $0
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+echo Deploying from $DIR
 
 echo Installing all necessary packages
 cd ../BotSecrets
@@ -7,7 +8,7 @@ go install
 cd ../ScriptureBot
 git pull
 go install
-cd $0
+cd $DIR
 git pull
 go install
 
