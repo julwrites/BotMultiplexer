@@ -17,7 +17,7 @@ func TranslateToProps(req *http.Request, env *SessionData) bool {
 		log.Fatalf("Error occurred reading http request: %v", err)
 		return false
 	}
-	log.Printf("Request body: %s", strings.ReplaceAll(string(reqBody), "\n", ""))
+	log.Printf("Request body: %s", strings.ReplaceAll(string(reqBody), "\n", "\t"))
 
 	translated := false
 
