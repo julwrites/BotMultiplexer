@@ -182,3 +182,32 @@ func PostTelegram(env *SessionData) bool {
 
 	return true
 }
+
+func TelegramSuperscript(c string) string {
+	switch c {
+	case "0":
+		return "\u2070"
+	case "1":
+		return "\xb9"
+	case "2":
+		return "\xb2"
+	case "3":
+		return "\xb3"
+	case "4":
+		return "\u2074"
+	case "5":
+		return "\u2075"
+	case "6":
+		return "\u2076"
+	case "7":
+		return "\u2077"
+	case "8":
+		return "\u2078"
+	case "9":
+		return "\u2079"
+	case "-":
+		return "\u207b"
+	default:
+		return ""
+	}
+}
