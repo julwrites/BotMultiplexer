@@ -36,6 +36,7 @@ func TranslateToProps(req *http.Request, env *SessionData) bool {
 func PostFromProps(env *SessionData) bool {
 	switch env.Type {
 	case TYPE_TELEGRAM:
+		log.Printf("Posting to Telegram: %s, %v", env.Res.Message, env.Res.Affordances)
 		return PostTelegram(env)
 	}
 
