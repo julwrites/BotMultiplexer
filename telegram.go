@@ -89,7 +89,7 @@ func TelegramTranslate(body []byte, env *SessionData) bool {
 	var data TelegramRequest
 	err := json.Unmarshal(body, &data)
 	if err != nil {
-		log.Fatalf("Failed to unmarshal request body: %v", err)
+		log.Printf("Failed to unmarshal request body: %v", err)
 		return false
 	}
 
@@ -165,7 +165,7 @@ func PostTelegram(env *SessionData) bool {
 	}
 
 	if err != nil {
-		log.Fatalf("Error occurred during conversion to JSON: %v", err)
+		log.Printf("Error occurred during conversion to JSON: %v", err)
 		return false
 	}
 
@@ -175,7 +175,7 @@ func PostTelegram(env *SessionData) bool {
 		buffer := bytes.NewBuffer(chunk)
 		_, err = http.Post(endpoint, header, buffer)
 		if err != nil {
-			log.Fatalf("Error occurred during post: %v", err)
+			log.Printf("Error occurred during post: %v", err)
 			return false
 		}
 	}

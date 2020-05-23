@@ -14,7 +14,7 @@ import (
 func TranslateToProps(req *http.Request, env *SessionData) bool {
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		log.Fatalf("Error occurred reading http request: %v", err)
+		log.Printf("Error occurred reading http request: %v", err)
 		return false
 	}
 	log.Printf("Request body: %s", strings.ReplaceAll(string(reqBody), "\n", "\t"))
