@@ -24,6 +24,7 @@ func TranslateToProps(req *http.Request, env *SessionData) bool {
 	switch env.Type {
 	case TYPE_TELEGRAM:
 		translated = TelegramTranslate(reqBody, env)
+		break
 	}
 
 	if translated {
