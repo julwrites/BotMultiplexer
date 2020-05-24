@@ -1,7 +1,6 @@
 package botmultiplexer
 
 import (
-	"fmt"
 	"log"
 	"sort"
 	"strings"
@@ -79,13 +78,13 @@ func NextFormatBlock(str string, offset int) FormatBlock {
 
 	block.Start = candidates[0]
 
-	i := strings.Index(str[block.Start+1:], c)
-	if i == -1 {
+	block.End = strings.Index(str[block.Start+1:], c)
+	if block.End == -1 {
 		block.Type = Null
 		return block
 	}
 
-	block.End = i + offset + 2 // Account for starting offset + 2 markup symbols
+	block.End = block.End + block.Start + 1 // Account for starting offset + 2 markup symbols
 	block.Type = FormatType(c)
 
 	return block
@@ -94,10 +93,18 @@ func NextFormatBlock(str string, offset int) FormatBlock {
 func Format(str string, bold BoldFormatter, ita ItalicsFormatter, sup SuperscriptFormatter) string {
 	var outStr string
 
-	block := NextFormatBlock(str, 0)
-	log.Printf("Parsing block: %v", block)
-	for block.Type != Null {
-		fmtStr := str[block.Start+1 : block.End]
+	pos := 0
+	for true {
+		block := NextFormatBlock(str, pos)
+		log.Printf("Parsing block: %v", block)
+
+		if block.Type == Null {
+			break
+		}
+
+		outStr = outStr + str[pos:block.Start] // Add any text before the formatter
+
+		fmtStr := str[block.Start+1 : block.End] // Ignore the symbols
 
 		log.Printf("Input string: %s", fmtStr)
 
@@ -115,12 +122,13 @@ func Format(str string, bold BoldFormatter, ita ItalicsFormatter, sup Superscrip
 
 		log.Printf("Format string: %s", fmtStr)
 
-		outStr = fmt.Sprintf("%s%s%s", outStr, str[:block.Start], fmtStr)
+		outStr = outStr + fmtStr
 
-		block = NextFormatBlock(str, block.End+1)
-
-		log.Printf("Parsing block: %v", block)
+		pos = block.End + 1
 	}
+
+	// Any leftovers
+	outStr = outStr + str[pos:]
 
 	return outStr
 }

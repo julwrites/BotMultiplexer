@@ -207,26 +207,37 @@ func TelegramSuperscript(str string) string {
 		switch string(c) {
 		case "0":
 			out = out + "\u2070"
+			break
 		case "1":
 			out = out + "\xb9"
+			break
 		case "2":
 			out = out + "\xb2"
+			break
 		case "3":
 			out = out + "\xb3"
+			break
 		case "4":
 			out = out + "\u2074"
+			break
 		case "5":
 			out = out + "\u2075"
+			break
 		case "6":
 			out = out + "\u2076"
+			break
 		case "7":
 			out = out + "\u2077"
+			break
 		case "8":
 			out = out + "\u2078"
+			break
 		case "9":
 			out = out + "\u2079"
+			break
 		case "-":
 			out = out + "\u207b"
+			break
 		}
 	}
 
