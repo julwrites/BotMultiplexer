@@ -7,3 +7,5 @@ const TELEGRAM_FIELD_MESSAGE = "text"
 
 const FIELD_USER = "USER"
 const FIELD_MESSAGE = "MESSAGE"
+
+const TELEGRAM_PARSE_MODE = "MarkdownV2"

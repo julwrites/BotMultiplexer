@@ -39,9 +39,10 @@ type TelegramRequest struct {
 }
 
 type TelegramPost struct {
-	Id      string `json:"chat_id"`
-	Text    string `json:"text"`
-	ReplyId string `json:"reply_to_message_id"`
+	Id        string `json:"chat_id"`
+	Text      string `json:"text"`
+	ReplyId   string `json:"reply_to_message_id"`
+	ParseMode string `json:"parse_mode"`
 }
 
 type InlineButton struct {
@@ -129,6 +130,7 @@ func PrepTelegramMessage(env *SessionData) []TelegramPost {
 		base.Id = env.User.Id
 		base.ReplyId = env.Msg.Id
 		base.Text = chunk
+		base.ParseMode = TELEGRAM_PARSE_MODE
 
 		if env.Res.Affordances != nil {
 			if len(env.Res.Affordances.Options) > 0 {
@@ -193,11 +195,11 @@ func PostTelegram(env *SessionData) bool {
 }
 
 func TelegramBold(str string) string {
-	return fmt.Sprintf("**%s**", str)
+	return fmt.Sprintf("*%s*", str)
 }
 
 func TelegramItalics(str string) string {
-	return fmt.Sprintf("__%s__", str)
+	return fmt.Sprintf("_%s_", str)
 }
 
 func TelegramSuperscript(str string) string {
@@ -209,13 +211,13 @@ func TelegramSuperscript(str string) string {
 			out = out + "\u2070"
 			break
 		case "1":
-			out = out + "\u2071"
+			out = out + "\xb9"
 			break
 		case "2":
-			out = out + "\u2072"
+			out = out + "\xb2"
 			break
 		case "3":
-			out = out + "\u2073"
+			out = out + "\xb3"
 			break
 		case "4":
 			out = out + "\u2074"
