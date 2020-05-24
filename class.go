@@ -9,7 +9,8 @@ type UserData struct {
 	Lastname  string `datastore:""`
 	Username  string `datastore:""`
 	Id        string `datastore:""`
-	Type      string `datastore:""`
+	Type      string `datastore:""` // Group/Individual
+	Action    string `datastore:""` // Current action if any
 	Config    string `datastore:""`
 }
 
