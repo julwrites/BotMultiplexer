@@ -172,7 +172,7 @@ func PostTelegram(env *SessionData) bool {
 	chunks := Split(data, 4000)
 
 	for _, chunk := range chunks {
-		buffer := bytes.NewBuffer(chunk)
+		buffer := bytes.NewBuffer(Format(chunk, TelegramBold, TelegramItalics, TelegramSuperscript))
 		_, err = http.Post(endpoint, header, buffer)
 		if err != nil {
 			log.Printf("Error occurred during post: %v", err)
@@ -183,31 +183,43 @@ func PostTelegram(env *SessionData) bool {
 	return true
 }
 
-func TelegramSuperscript(c string) string {
-	switch c {
-	case "0":
-		return "\u2070"
-	case "1":
-		return "\xb9"
-	case "2":
-		return "\xb2"
-	case "3":
-		return "\xb3"
-	case "4":
-		return "\u2074"
-	case "5":
-		return "\u2075"
-	case "6":
-		return "\u2076"
-	case "7":
-		return "\u2077"
-	case "8":
-		return "\u2078"
-	case "9":
-		return "\u2079"
-	case "-":
-		return "\u207b"
-	default:
-		return ""
+func TelegramBold(str string) string {
+	return strings.ReplaceAll(str, "*", "**")
+}
+
+func TelegramItalics(str string) string {
+	return str
+}
+
+func TelegramSuperscript(str string) string {
+	var out string
+
+	for _, c := range str {
+		switch string(c) {
+		case "0":
+			out = out + "\u2070"
+		case "1":
+			out = out + "\xb9"
+		case "2":
+			out = out + "\xb2"
+		case "3":
+			out = out + "\xb3"
+		case "4":
+			out = out + "\u2074"
+		case "5":
+			out = out + "\u2075"
+		case "6":
+			out = out + "\u2076"
+		case "7":
+			out = out + "\u2077"
+		case "8":
+			out = out + "\u2078"
+		case "9":
+			out = out + "\u2079"
+		case "-":
+			out = out + "\u207b"
+		}
 	}
+
+	return out
 }

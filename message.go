@@ -87,19 +87,19 @@ func Format(msg []byte, bold BoldFormatter, ita ItalicsFormatter, sup Superscrip
 
 		switch block.Type {
 		case Bold:
-			fmtStr = bold(string(str[block.Start : block.End+1]))
+			fmtStr = bold(string(str[block.Start+1 : block.End]))
 			break
 		case Italics:
-			fmtStr = ita(string(str[block.Start : block.End+1]))
+			fmtStr = ita(string(str[block.Start+1 : block.End]))
 			break
 		case Superscript:
-			fmtStr = sup(string(str[block.Start : block.End+1]))
+			fmtStr = sup(string(str[block.Start+1 : block.End]))
 			break
 		default:
-			fmtStr = string(str[block.Start : block.End+1])
+			fmtStr = string(str[block.Start+1 : block.End])
 		}
 
-		outStr = fmt.Sprintf("%s%s%s%s", outStr, str[:block.Start], fmtStr, str[block.End:])
+		outStr = fmt.Sprintf("%s%s%s%s", outStr, str[:block.Start], fmtStr, str[block.End+1:])
 
 		block = NextFormatBlock(str[block.End+1:])
 	}
