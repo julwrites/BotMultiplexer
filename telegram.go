@@ -193,11 +193,11 @@ func PostTelegram(env *SessionData) bool {
 }
 
 func TelegramBold(str string) string {
-	return fmt.Sprintf("*%s*", str)
+	return fmt.Sprintf("**%s**", str)
 }
 
 func TelegramItalics(str string) string {
-	return fmt.Sprintf("_%s_", str)
+	return fmt.Sprintf("__%s__", str)
 }
 
 func TelegramSuperscript(str string) string {
@@ -209,13 +209,13 @@ func TelegramSuperscript(str string) string {
 			out = out + "\u2070"
 			break
 		case "1":
-			out = out + "\xb9"
+			out = out + "\x2071"
 			break
 		case "2":
-			out = out + "\xb2"
+			out = out + "\x2072"
 			break
 		case "3":
-			out = out + "\xb3"
+			out = out + "\x2073"
 			break
 		case "4":
 			out = out + "\u2074"
@@ -234,9 +234,6 @@ func TelegramSuperscript(str string) string {
 			break
 		case "9":
 			out = out + "\u2079"
-			break
-		case "-":
-			out = out + "\u207b"
 			break
 		}
 	}
