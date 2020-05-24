@@ -43,7 +43,7 @@ const (
 	Bold        FormatType = "*"
 	Italics     FormatType = "_"
 	Superscript FormatType = "^"
-	Null        FormatType = "/"
+	Null        FormatType = "0"
 )
 
 type FormatBlock struct {
@@ -52,76 +52,75 @@ type FormatBlock struct {
 	Type  FormatType
 }
 
-func NextFormatBlock(str string) FormatBlock {
+func NextFormatBlock(str string, offset int) FormatBlock {
 	var candidates []int
 	var formattypes = []string{
 		string(Bold),
 		string(Italics),
 		string(Superscript),
 	}
+	var block FormatBlock
 
 	for _, f := range formattypes {
-		candidates = append(candidates, strings.Index(str, f))
+		i := strings.Index(str[offset:], f)
+		if i == -1 {
+			continue
+		}
+		candidates = append(candidates, i+offset)
+	}
+
+	if len(candidates) == 0 {
+		block.Type = Null
+		return block
 	}
 
 	sort.Ints(candidates)
 	c := string(str[candidates[0]])
 
-	var block FormatBlock
-
 	block.Start = candidates[0]
-	block.End = strings.Index(str[block.Start+1:], c)
-	if block.Start != -1 && block.End != -1 {
-		block.Type = FormatType(c)
-	} else {
+
+	i := strings.Index(str[block.Start+1:], c)
+	if i == -1 {
 		block.Type = Null
+		return block
 	}
+
+	block.End = i + offset + 2 // Account for starting offset + 2 markup symbols
+	block.Type = FormatType(c)
 
 	return block
 }
 
-func Format(msg []byte, bold BoldFormatter, ita ItalicsFormatter, sup SuperscriptFormatter) []byte {
-	str := string(msg)
-
+func Format(str string, bold BoldFormatter, ita ItalicsFormatter, sup SuperscriptFormatter) string {
 	var outStr string
 
-	block := NextFormatBlock(str)
+	block := NextFormatBlock(str, 0)
+	log.Printf("Parsing block: %v", block)
 	for block.Type != Null {
-		log.Printf("Parsing block: %v", block)
-		var fmtStr string
+		fmtStr := str[block.Start+1 : block.End]
+
+		log.Printf("Input string: %s", fmtStr)
 
 		switch block.Type {
 		case Bold:
-			fmtStr = bold(string(str[block.Start+1 : block.End]))
+			fmtStr = bold(fmtStr)
 			break
 		case Italics:
-			fmtStr = ita(string(str[block.Start+1 : block.End]))
+			fmtStr = ita(fmtStr)
 			break
 		case Superscript:
-			fmtStr = sup(string(str[block.Start+1 : block.End]))
+			fmtStr = sup(fmtStr)
 			break
-		default:
-			fmtStr = string(str[block.Start+1 : block.End])
 		}
 
-		log.Printf("Output string: %s", fmtStr)
+		log.Printf("Format string: %s", fmtStr)
 
-		outStr = fmt.Sprintf("%s%s%s%s", outStr, str[:block.Start], fmtStr, str[block.End+1:])
+		outStr = fmt.Sprintf("%s%s%s", outStr, str[:block.Start], fmtStr)
 
-		block = NextFormatBlock(str[block.End+1:])
+		block = NextFormatBlock(str, block.End+1)
+
+		log.Printf("Parsing block: %v", block)
 	}
 
-	start := strings.Index(str, "^")
-	for start != -1 {
-		end := strings.Index(str[start+1:], "^")
-
-		if end != -1 {
-			var replace string
-			for _, c := range str[start+1 : end] {
-				replace = fmt.Sprintf("%s%s", replace, sup(string(c)))
-			}
-		}
-	}
-
-	return []byte(outStr)
+	return outStr
 }

@@ -3,6 +3,7 @@ package botmultiplexer
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -118,6 +119,9 @@ func TelegramTranslate(body []byte, env *SessionData) bool {
 
 func PrepTelegramMessage(env *SessionData) []TelegramPost {
 	var posts []TelegramPost
+
+	env.Res.Message = Format(env.Res.Message, TelegramBold, TelegramItalics, TelegramSuperscript)
+
 	chunks := Split(env.Res.Message, 4000)
 
 	for _, chunk := range chunks {
@@ -177,9 +181,7 @@ func PostTelegram(env *SessionData) bool {
 			continue
 		}
 
-		log.Printf("Formatted data: %s", Format(data, TelegramBold, TelegramItalics, TelegramSuperscript))
-
-		buffer := bytes.NewBuffer(Format(data, TelegramBold, TelegramItalics, TelegramSuperscript))
+		buffer := bytes.NewBuffer(data)
 		_, err = http.Post(endpoint, header, buffer)
 		if err != nil {
 			log.Printf("Error occurred during post: %v", err)
@@ -191,11 +193,11 @@ func PostTelegram(env *SessionData) bool {
 }
 
 func TelegramBold(str string) string {
-	return strings.ReplaceAll(str, "*", "**")
+	return fmt.Sprintf("*%s*", str)
 }
 
 func TelegramItalics(str string) string {
-	return str
+	return fmt.Sprintf("_%s_", str)
 }
 
 func TelegramSuperscript(str string) string {
