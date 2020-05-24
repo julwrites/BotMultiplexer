@@ -176,19 +176,20 @@ func PostTelegram(env *SessionData) bool {
 	posts := PrepTelegramMessage(env)
 
 	for _, post := range posts {
-		data, err := json.Marshal(post)
-
-		if err != nil {
-			log.Printf("Error occurred during conversion to JSON: %v", err)
+		data, jsonErr := json.Marshal(post)
+		if jsonErr != nil {
+			log.Printf("Error occurred during conversion to JSON: %v", jsonErr)
 			continue
 		}
 
 		buffer := bytes.NewBuffer(data)
-		_, err = http.Post(endpoint, header, buffer)
-		if err != nil {
-			log.Printf("Error occurred during post: %v", err)
+		res, postErr := http.Post(endpoint, header, buffer)
+		if postErr != nil {
+			log.Printf("Error occurred during post: %v", postErr)
 			return false
 		}
+
+		log.Printf("Posted message, response %v", res)
 	}
 
 	return true
