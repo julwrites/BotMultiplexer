@@ -2,12 +2,13 @@ package botmultiplexer
 
 import (
 	"fmt"
+	"log"
 	"sort"
 	"strings"
 )
 
-func Split(msg []byte, maxSize int) [][]byte {
-	var splits [][]byte
+func Split(msg string, maxSize int) []string {
+	var splits []string
 
 	msgStr := string(msg)
 	paragraphs := strings.SplitAfter(msgStr, "\n")
@@ -20,13 +21,13 @@ func Split(msg []byte, maxSize int) [][]byte {
 			group = append(group, para)
 			chunk = strings.Join(group, "\n")
 		} else {
-			splits = append(splits, []byte(chunk))
+			splits = append(splits, chunk)
 			chunk = para
 		}
 	}
 	// Any leftovers should be accounted for
 	if len(chunk) > 0 {
-		splits = append(splits, []byte(chunk))
+		splits = append(splits, chunk)
 	}
 
 	return splits
@@ -86,7 +87,7 @@ func Format(msg []byte, bold BoldFormatter, ita ItalicsFormatter, sup Superscrip
 
 	block := NextFormatBlock(str)
 	for block.Type != Null {
-
+		log.Printf("Parsing block: %v", block)
 		var fmtStr string
 
 		switch block.Type {
@@ -102,6 +103,8 @@ func Format(msg []byte, bold BoldFormatter, ita ItalicsFormatter, sup Superscrip
 		default:
 			fmtStr = string(str[block.Start+1 : block.End])
 		}
+
+		log.Printf("Output string: %s", fmtStr)
 
 		outStr = fmt.Sprintf("%s%s%s%s", outStr, str[:block.Start], fmtStr, str[block.End+1:])
 

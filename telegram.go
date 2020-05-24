@@ -116,65 +116,70 @@ func TelegramTranslate(body []byte, env *SessionData) bool {
 	return true
 }
 
+func PrepTelegramMessage(env *SessionData) []TelegramPost {
+	var posts []TelegramPost
+	chunks := Split(env.Res.Message, 4000)
+
+	for _, chunk := range chunks {
+		var base TelegramPost
+		base.Id = env.User.Id
+		base.ReplyId = env.Msg.Id
+		base.Text = chunk
+
+		if env.Res.Affordances != nil {
+			if len(env.Res.Affordances.Options) > 0 {
+				if env.Res.Affordances.Inline {
+					var buttons []InlineButton
+					for i := 0; i < len(env.Res.Affordances.Options); i++ {
+						buttons = append(buttons, InlineButton{env.Res.Affordances.Options[i].Text, env.Res.Affordances.Options[i].Link})
+					}
+					var markup InlineMarkup
+					markup.Keyboard = append([][]InlineButton{}, buttons)
+					var message TelegramInlinePost
+					message.TelegramPost = base
+					message.Markup = markup
+				} else {
+					var buttons []KeyButton
+					for i := 0; i < len(env.Res.Affordances.Options); i++ {
+						buttons = append(buttons, KeyButton{env.Res.Affordances.Options[i].Text})
+					}
+					var markup ReplyMarkup
+					markup.Keyboard = append([][]KeyButton{}, buttons)
+					var message TelegramReplyPost
+					message.TelegramPost = base
+					message.Markup = markup
+				}
+			} else if env.Res.Affordances.Remove {
+				var message TelegramRemovePost
+				message.TelegramPost = base
+				message.Markup.Remove = true
+				message.Markup.Selective = true
+			}
+		}
+
+		posts = append(posts, base)
+	}
+
+	return posts
+}
+
 func PostTelegram(env *SessionData) bool {
 	endpoint := "https://api.telegram.org/bot" + env.Secrets.TELEGRAM_ID + "/sendMessage"
 	header := "application/json;charset=utf-8"
 
-	var base TelegramPost
-	base.Id = env.User.Id
-	base.ReplyId = env.Msg.Id
-	base.Text = env.Res.Message
+	posts := PrepTelegramMessage(env)
 
-	var data []byte
-	var err error
+	for _, post := range posts {
+		data, err := json.Marshal(post)
 
-	if env.Res.Affordances != nil {
-		if len(env.Res.Affordances.Options) > 0 {
-			if env.Res.Affordances.Inline {
-				var buttons []InlineButton
-				for i := 0; i < len(env.Res.Affordances.Options); i++ {
-					buttons = append(buttons, InlineButton{env.Res.Affordances.Options[i].Text, env.Res.Affordances.Options[i].Link})
-				}
-				var markup InlineMarkup
-				markup.Keyboard = append([][]InlineButton{}, buttons)
-				var message TelegramInlinePost
-				message.TelegramPost = base
-				message.Markup = markup
-				data, err = json.Marshal(message)
-			} else {
-				var buttons []KeyButton
-				for i := 0; i < len(env.Res.Affordances.Options); i++ {
-					buttons = append(buttons, KeyButton{env.Res.Affordances.Options[i].Text})
-				}
-				var markup ReplyMarkup
-				markup.Keyboard = append([][]KeyButton{}, buttons)
-				var message TelegramReplyPost
-				message.TelegramPost = base
-				message.Markup = markup
-				data, err = json.Marshal(message)
-			}
-		} else if env.Res.Affordances.Remove {
-			var message TelegramRemovePost
-			message.TelegramPost = base
-			message.Markup.Remove = true
-			message.Markup.Selective = true
-			data, err = json.Marshal(message)
+		if err != nil {
+			log.Printf("Error occurred during conversion to JSON: %v", err)
+			continue
 		}
-	} else {
-		data, err = json.Marshal(base)
-	}
 
-	if err != nil {
-		log.Printf("Error occurred during conversion to JSON: %v", err)
-		return false
-	}
+		log.Printf("Formatted data: %s", Format(data, TelegramBold, TelegramItalics, TelegramSuperscript))
 
-	chunks := Split(data, 4000)
-
-	for _, chunk := range chunks {
-		log.Printf("Formatted chunk: %s", Format(chunk, TelegramBold, TelegramItalics, TelegramSuperscript))
-
-		buffer := bytes.NewBuffer(Format(chunk, TelegramBold, TelegramItalics, TelegramSuperscript))
+		buffer := bytes.NewBuffer(Format(data, TelegramBold, TelegramItalics, TelegramSuperscript))
 		_, err = http.Post(endpoint, header, buffer)
 		if err != nil {
 			log.Printf("Error occurred during post: %v", err)
