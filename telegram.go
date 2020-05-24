@@ -118,69 +118,77 @@ func TelegramTranslate(body []byte, env *SessionData) bool {
 	return true
 }
 
-func PrepTelegramMessage(env *SessionData) []TelegramPost {
-	var posts []TelegramPost
+func PrepTelegramMessage(post TelegramPost, env *SessionData) []byte {
+	data, jsonErr := json.Marshal(post)
+	if jsonErr != nil {
+		log.Printf("Error occurred during conversion to JSON: %v", jsonErr)
+		return nil
+	}
+	return data
+}
 
-	env.Res.Message = Format(env.Res.Message, TelegramBold, TelegramItalics, TelegramSuperscript)
+func PrepTelegramOptions(base TelegramPost, env *SessionData) []byte {
+	var data []byte
+	var jsonErr error
 
-	chunks := Split(env.Res.Message, 4000)
-
-	for _, chunk := range chunks {
-		var base TelegramPost
-		base.Id = env.User.Id
-		base.ReplyId = env.Msg.Id
-		base.Text = chunk
-		base.ParseMode = TELEGRAM_PARSE_MODE
-
-		if env.Res.Affordances != nil {
-			if len(env.Res.Affordances.Options) > 0 {
-				if env.Res.Affordances.Inline {
-					var buttons []InlineButton
-					for i := 0; i < len(env.Res.Affordances.Options); i++ {
-						buttons = append(buttons, InlineButton{env.Res.Affordances.Options[i].Text, env.Res.Affordances.Options[i].Link})
-					}
-					var markup InlineMarkup
-					markup.Keyboard = append([][]InlineButton{}, buttons)
-					var message TelegramInlinePost
-					message.TelegramPost = base
-					message.Markup = markup
-				} else {
-					var buttons []KeyButton
-					for i := 0; i < len(env.Res.Affordances.Options); i++ {
-						buttons = append(buttons, KeyButton{env.Res.Affordances.Options[i].Text})
-					}
-					var markup ReplyMarkup
-					markup.Keyboard = append([][]KeyButton{}, buttons)
-					var message TelegramReplyPost
-					message.TelegramPost = base
-					message.Markup = markup
+	if env.Res.Affordances != nil {
+		if len(env.Res.Affordances.Options) > 0 {
+			if env.Res.Affordances.Inline {
+				var buttons []InlineButton
+				for i := 0; i < len(env.Res.Affordances.Options); i++ {
+					buttons = append(buttons, InlineButton{env.Res.Affordances.Options[i].Text, env.Res.Affordances.Options[i].Link})
 				}
-			} else if env.Res.Affordances.Remove {
-				var message TelegramRemovePost
+				var markup InlineMarkup
+				markup.Keyboard = append([][]InlineButton{}, buttons)
+				var message TelegramInlinePost
 				message.TelegramPost = base
-				message.Markup.Remove = true
-				message.Markup.Selective = true
+				message.Markup = markup
+				data, jsonErr = json.Marshal(message)
+			} else {
+				var buttons []KeyButton
+				for i := 0; i < len(env.Res.Affordances.Options); i++ {
+					buttons = append(buttons, KeyButton{env.Res.Affordances.Options[i].Text})
+				}
+				var markup ReplyMarkup
+				markup.Keyboard = append([][]KeyButton{}, buttons)
+				var message TelegramReplyPost
+				message.TelegramPost = base
+				message.Markup = markup
+				data, jsonErr = json.Marshal(message)
 			}
+		} else if env.Res.Affordances.Remove {
+			var message TelegramRemovePost
+			message.TelegramPost = base
+			message.Markup.Remove = true
+			message.Markup.Selective = true
+			data, jsonErr = json.Marshal(message)
 		}
-
-		posts = append(posts, base)
 	}
 
-	return posts
+	if jsonErr != nil {
+		log.Printf("Error occurred during conversion to JSON: %v", jsonErr)
+		return nil
+	}
+
+	return data
 }
 
 func PostTelegram(env *SessionData) bool {
 	endpoint := "https://api.telegram.org/bot" + env.Secrets.TELEGRAM_ID + "/sendMessage"
 	header := "application/json;charset=utf-8"
 
-	posts := PrepTelegramMessage(env)
+	env.Res.Message = Format(env.Res.Message, TelegramBold, TelegramItalics, TelegramSuperscript)
 
-	for _, post := range posts {
-		data, jsonErr := json.Marshal(post)
-		if jsonErr != nil {
-			log.Printf("Error occurred during conversion to JSON: %v", jsonErr)
-			continue
-		}
+	chunks := Split(env.Res.Message, 4000)
+
+	var base TelegramPost
+	base.Id = env.User.Id
+	base.ReplyId = env.Msg.Id
+	base.ParseMode = TELEGRAM_PARSE_MODE
+
+	for _, chunk := range chunks {
+		base.Text = chunk
+		data := PrepTelegramMessage(base, env)
 
 		buffer := bytes.NewBuffer(data)
 		res, postErr := http.Post(endpoint, header, buffer)
