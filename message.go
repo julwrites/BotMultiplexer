@@ -1,7 +1,6 @@
 package botmultiplexer
 
 import (
-	"log"
 	"sort"
 	"strings"
 )
@@ -99,17 +98,12 @@ func Format(str string, normal NormalFormatter, bold BoldFormatter, ita ItalicsF
 	pos := 0
 	for true {
 		block := NextFormatBlock(str, pos)
-		log.Printf("Parsing block: %v", block)
-
 		if block.Type == Null {
 			break
 		}
 
-		outStr = outStr + str[pos:block.Start] // Add any text before the formatter
-
+		outStr = outStr + str[pos:block.Start]   // Add any text before the formatter
 		fmtStr := str[block.Start+1 : block.End] // Ignore the symbols
-
-		log.Printf("Input string: %s", fmtStr)
 
 		switch block.Type {
 		case Bold:
@@ -122,8 +116,6 @@ func Format(str string, normal NormalFormatter, bold BoldFormatter, ita ItalicsF
 			fmtStr = sup(fmtStr)
 			break
 		}
-
-		log.Printf("Format string: %s", fmtStr)
 
 		outStr = outStr + fmtStr
 

@@ -124,20 +124,11 @@ func TelegramTranslate(body []byte, env *SessionData) bool {
 
 // Translate to Telegram
 
-func PrepTelegramMessage(post TelegramPost, env *SessionData) []byte {
-	data, jsonErr := json.Marshal(post)
-	if jsonErr != nil {
-		log.Printf("Error occurred during conversion to JSON: %v", jsonErr)
-		return nil
-	}
-	return data
-}
-
-func PrepTelegramOptions(base TelegramPost, env *SessionData) []byte {
+func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 	var data []byte
 	var jsonErr error
 
-	if env.Res.Affordances != nil {
+	if len(env.Res.Affordances.Options) > 0 || env.Res.Affordances.Remove {
 		if len(env.Res.Affordances.Options) > 0 {
 			if env.Res.Affordances.Inline {
 				var buttons []InlineButton
@@ -169,6 +160,8 @@ func PrepTelegramOptions(base TelegramPost, env *SessionData) []byte {
 			message.Markup.Selective = true
 			data, jsonErr = json.Marshal(message)
 		}
+	} else {
+		data, jsonErr = json.Marshal(base)
 	}
 
 	if jsonErr != nil {
@@ -183,9 +176,9 @@ func PostTelegram(env *SessionData) bool {
 	endpoint := "https://api.telegram.org/bot" + env.Secrets.TELEGRAM_ID + "/sendMessage"
 	header := "application/json;charset=utf-8"
 
-	env.Res.Message = Format(env.Res.Message, TelegramNormal, TelegramBold, TelegramItalics, TelegramSuperscript)
+	text := Format(env.Res.Message, TelegramNormal, TelegramBold, TelegramItalics, TelegramSuperscript)
 
-	chunks := Split(env.Res.Message, 4000)
+	chunks := Split(text, 4000)
 
 	var base TelegramPost
 	base.Id = env.User.Id

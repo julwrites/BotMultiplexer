@@ -34,7 +34,7 @@ type ResponseOptions struct {
 
 type ResponseData struct {
 	Message     string
-	Affordances *ResponseOptions
+	Affordances ResponseOptions
 }
 
 type SessionData struct {
