@@ -124,11 +124,15 @@ func TelegramTranslate(body []byte, env *SessionData) bool {
 
 // Translate to Telegram
 
+func HasOptions(env *SessionData) bool {
+	return len(env.Res.Affordances.Options) > 0 || env.Res.Affordances.Remove
+}
+
 func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 	var data []byte
 	var jsonErr error
 
-	if len(env.Res.Affordances.Options) > 0 || env.Res.Affordances.Remove {
+	if HasOptions(env) {
 		if len(env.Res.Affordances.Options) > 0 {
 			if env.Res.Affordances.Inline {
 				var buttons []InlineButton
