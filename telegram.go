@@ -133,7 +133,14 @@ func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 	var jsonErr error
 
 	if HasOptions(env) {
-		if len(env.Res.Affordances.Options) > 0 {
+		if env.Res.Affordances.Remove {
+			log.Printf("Found an Affordance Removal command")
+			var message TelegramRemovePost
+			message.TelegramPost = base
+			message.Markup.Remove = true
+			message.Markup.Selective = true
+			data, jsonErr = json.Marshal(message)
+		} else if len(env.Res.Affordances.Options) > 0 {
 			if env.Res.Affordances.Inline {
 				log.Printf("Found an Inline Affordance command")
 				var buttons []InlineButton
@@ -159,13 +166,6 @@ func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 				message.Markup = markup
 				data, jsonErr = json.Marshal(message)
 			}
-		} else if env.Res.Affordances.Remove {
-			log.Printf("Found an Affordance Removal command")
-			var message TelegramRemovePost
-			message.TelegramPost = base
-			message.Markup.Remove = true
-			message.Markup.Selective = true
-			data, jsonErr = json.Marshal(message)
 		}
 	} else {
 		data, jsonErr = json.Marshal(base)
