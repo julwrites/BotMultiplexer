@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+// Classes
+
 type TelegramSender struct {
 	Id        int    `json:"id"`
 	Bot       bool   `json:"is_bot"`
@@ -41,8 +43,8 @@ type TelegramRequest struct {
 type TelegramPost struct {
 	Id        string `json:"chat_id"`
 	Text      string `json:"text"`
-	ReplyId   string `json:"reply_to_message_id"`
 	ParseMode string `json:"parse_mode"`
+	ReplyId   string `json:"reply_to_message_id"`
 }
 
 type InlineButton struct {
@@ -85,6 +87,8 @@ type TelegramRemovePost struct {
 	Markup RemoveMarkup `json:"reply_markup`
 }
 
+// Translate to properties
+
 func TelegramTranslate(body []byte, env *SessionData) bool {
 	log.Printf("Parsing Telegram message")
 
@@ -117,6 +121,8 @@ func TelegramTranslate(body []byte, env *SessionData) bool {
 
 	return true
 }
+
+// Translate to Telegram
 
 func PrepTelegramMessage(post TelegramPost, env *SessionData) []byte {
 	data, jsonErr := json.Marshal(post)
@@ -177,14 +183,14 @@ func PostTelegram(env *SessionData) bool {
 	endpoint := "https://api.telegram.org/bot" + env.Secrets.TELEGRAM_ID + "/sendMessage"
 	header := "application/json;charset=utf-8"
 
-	env.Res.Message = Format(env.Res.Message, TelegramBold, TelegramItalics, TelegramSuperscript)
+	env.Res.Message = Format(env.Res.Message, TelegramNormal, TelegramBold, TelegramItalics, TelegramSuperscript)
 
 	chunks := Split(env.Res.Message, 4000)
 
 	var base TelegramPost
 	base.Id = env.User.Id
-	base.ReplyId = env.Msg.Id
 	base.ParseMode = TELEGRAM_PARSE_MODE
+	base.ReplyId = env.Msg.Id
 
 	for _, chunk := range chunks {
 		base.Text = chunk
@@ -201,6 +207,28 @@ func PostTelegram(env *SessionData) bool {
 	}
 
 	return true
+}
+
+// Formatting methods
+
+func TelegramNormal(str string) string {
+	str = strings.ReplaceAll(str, "[", "\\[")
+	str = strings.ReplaceAll(str, "]", "\\]")
+	str = strings.ReplaceAll(str, "(", "\\(")
+	str = strings.ReplaceAll(str, ")", "\\)")
+	str = strings.ReplaceAll(str, "~", "\\~")
+	str = strings.ReplaceAll(str, ">", "\\>")
+	str = strings.ReplaceAll(str, "#", "\\#")
+	str = strings.ReplaceAll(str, "+", "\\+")
+	str = strings.ReplaceAll(str, "-", "\\-")
+	str = strings.ReplaceAll(str, "=", "\\=")
+	str = strings.ReplaceAll(str, "|", "\\|")
+	str = strings.ReplaceAll(str, "{", "\\{")
+	str = strings.ReplaceAll(str, "}", "\\}")
+	str = strings.ReplaceAll(str, ".", "\\.")
+	str = strings.ReplaceAll(str, "!", "\\!")
+
+	return str
 }
 
 func TelegramBold(str string) string {
@@ -220,13 +248,13 @@ func TelegramSuperscript(str string) string {
 			out = out + "\u2070"
 			break
 		case "1":
-			out = out + "\xb9"
+			out = out + "\u00b9"
 			break
 		case "2":
-			out = out + "\xb2"
+			out = out + "\u00b2"
 			break
 		case "3":
-			out = out + "\xb3"
+			out = out + "\u00b3"
 			break
 		case "4":
 			out = out + "\u2074"
