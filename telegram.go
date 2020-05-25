@@ -135,6 +135,7 @@ func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 	if HasOptions(env) {
 		if len(env.Res.Affordances.Options) > 0 {
 			if env.Res.Affordances.Inline {
+				log.Printf("Found an Inline Affordance command")
 				var buttons []InlineButton
 				for i := 0; i < len(env.Res.Affordances.Options); i++ {
 					buttons = append(buttons, InlineButton{env.Res.Affordances.Options[i].Text, env.Res.Affordances.Options[i].Link})
@@ -146,6 +147,7 @@ func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 				message.Markup = markup
 				data, jsonErr = json.Marshal(message)
 			} else {
+				log.Printf("Found a Keyboard Affordance command")
 				var buttons []KeyButton
 				for i := 0; i < len(env.Res.Affordances.Options); i++ {
 					buttons = append(buttons, KeyButton{env.Res.Affordances.Options[i].Text})
@@ -158,6 +160,7 @@ func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 				data, jsonErr = json.Marshal(message)
 			}
 		} else if env.Res.Affordances.Remove {
+			log.Printf("Found an Affordance Removal command")
 			var message TelegramRemovePost
 			message.TelegramPost = base
 			message.Markup.Remove = true
