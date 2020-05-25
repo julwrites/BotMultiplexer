@@ -138,7 +138,6 @@ func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 			var message TelegramRemovePost
 			message.TelegramPost = base
 			message.Markup.Remove = true
-			message.Markup.Selective = true
 			data, jsonErr = json.Marshal(message)
 		} else if len(env.Res.Affordances.Options) > 0 {
 			if env.Res.Affordances.Inline {
