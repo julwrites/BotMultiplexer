@@ -68,7 +68,7 @@ type KeyButton struct {
 type ReplyMarkup struct {
 	Keyboard  [][]KeyButton `json:"keyboard"`
 	Resize    bool          `json:"resize_keyboard"`
-	Once      bool          `json:"one_time_keyboard`
+	Once      bool          `json:"one_time_keyboard"`
 	Selective bool          `json:"selective"`
 }
 
@@ -84,26 +84,31 @@ type RemoveMarkup struct {
 
 type TelegramRemovePost struct {
 	TelegramPost
-	Markup RemoveMarkup `json:"reply_markup`
+	Markup RemoveMarkup `json:"reply_markup"`
 }
 
 // Translate to properties
 
-func TelegramTranslate(body []byte, env *SessionData) bool {
+func TelegramTranslate(body []byte) SessionData {
 	log.Printf("Parsing Telegram message")
+
+	var env SessionData
+	env.Type = TYPE_TELEGRAM
 
 	var data TelegramRequest
 	err := json.Unmarshal(body, &data)
 	if err != nil {
 		log.Printf("Failed to unmarshal request body: %v", err)
-		return false
+		return env
 	}
 
 	env.User.Firstname = data.Message.Sender.Firstname
 	env.User.Lastname = data.Message.Sender.Lastname
 	env.User.Username = data.Message.Sender.Username
 	env.User.Id = strconv.Itoa(data.Message.Sender.Id)
-	env.User.Type = TYPE_TELEGRAM
+
+	// TODO: Implement support for groups
+	// env.User.Type = data.Message.Sender.Title
 
 	log.Printf("User: %s %s | %s : %s", env.User.Firstname, env.User.Lastname, env.User.Username, env.User.Id)
 
@@ -119,29 +124,29 @@ func TelegramTranslate(body []byte, env *SessionData) bool {
 
 	log.Printf("Message: %s | %s", env.Msg.Command, env.Msg.Message)
 
-	return true
+	return env
 }
 
 // Translate to Telegram
 
-func HasOptions(env *SessionData) bool {
+func HasOptions(env SessionData) bool {
 	return len(env.Res.Affordances.Options) > 0 || env.Res.Affordances.Remove
 }
 
-func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
+func PrepTelegramMessage(base TelegramPost, env SessionData) []byte {
 	var data []byte
 	var jsonErr error
 
 	if HasOptions(env) {
 		if env.Res.Affordances.Remove {
-			log.Printf("Found an Affordance Removal command")
 			var message TelegramRemovePost
 			message.TelegramPost = base
 			message.Markup.Remove = true
+			message.Markup.Selective = true
 			data, jsonErr = json.Marshal(message)
+			log.Printf("Post with Affordance Removal command")
 		} else if len(env.Res.Affordances.Options) > 0 {
 			if env.Res.Affordances.Inline {
-				log.Printf("Found an Inline Affordance command")
 				var buttons []InlineButton
 				for i := 0; i < len(env.Res.Affordances.Options); i++ {
 					buttons = append(buttons, InlineButton{env.Res.Affordances.Options[i].Text, env.Res.Affordances.Options[i].Link})
@@ -152,8 +157,8 @@ func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 				message.TelegramPost = base
 				message.Markup = markup
 				data, jsonErr = json.Marshal(message)
+				log.Printf("Post with Inline Affordance command")
 			} else {
-				log.Printf("Found a Keyboard Affordance command")
 				var buttons []KeyButton
 				for i := 0; i < len(env.Res.Affordances.Options); i++ {
 					buttons = append(buttons, KeyButton{env.Res.Affordances.Options[i].Text})
@@ -164,6 +169,7 @@ func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 				message.TelegramPost = base
 				message.Markup = markup
 				data, jsonErr = json.Marshal(message)
+				log.Printf("Post with Keyboard Affordance command")
 			}
 		}
 	} else {
@@ -178,7 +184,7 @@ func PrepTelegramMessage(base TelegramPost, env *SessionData) []byte {
 	return data
 }
 
-func PostTelegram(env *SessionData) bool {
+func PostTelegram(env SessionData) bool {
 	endpoint := "https://api.telegram.org/bot" + env.Secrets.TELEGRAM_ID + "/sendMessage"
 	header := "application/json;charset=utf-8"
 

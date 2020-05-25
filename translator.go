@@ -11,30 +11,24 @@ import (
 // consistent format, and to translate that format back into a HTTP payload
 // for posting
 
-func TranslateToProps(req *http.Request, env *SessionData) bool {
+func TranslateToProps(req *http.Request, propType string) (SessionData, bool) {
+
 	reqBody, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		log.Printf("Error occurred reading http request: %v", err)
-		return false
+		return SessionData{}, false
 	}
 	log.Printf("Request body: %s", strings.ReplaceAll(string(reqBody), "\n", "\t"))
 
-	translated := false
-
-	switch env.Type {
+	switch propType {
 	case TYPE_TELEGRAM:
-		translated = TelegramTranslate(reqBody, env)
-		break
+		return TelegramTranslate(reqBody), true
 	}
 
-	if translated {
-		return translated
-	}
-
-	return false
+	return SessionData{}, true
 }
 
-func PostFromProps(env *SessionData) bool {
+func PostFromProps(env SessionData) bool {
 	switch env.Type {
 	case TYPE_TELEGRAM:
 		log.Printf("Posting to Telegram -> {Message: %s, Affordances: %v}", env.Res.Message, env.Res.Affordances)
