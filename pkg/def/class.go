@@ -1,4 +1,4 @@
-package botmultiplexer
+package def
 
 import botsecrets "github.com/julwrites/BotSecrets"
 

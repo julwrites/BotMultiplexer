@@ -1,4 +1,4 @@
-package botmultiplexer
+package api
 
 import (
 	"sort"

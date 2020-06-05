@@ -1,4 +1,4 @@
-package botmultiplexer
+package def
 
 const TYPE_TELEGRAM = "TELEGRAM"
 

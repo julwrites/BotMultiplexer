@@ -1,4 +1,4 @@
-package botmultiplexer
+package api
 
 import (
 	"bytes"
@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/julwrites/BotMultiplexer/pkg/def"
 )
 
 // Classes
@@ -89,11 +91,11 @@ type TelegramRemovePost struct {
 
 // Translate to properties
 
-func TelegramTranslate(body []byte) SessionData {
+func TelegramTranslate(body []byte) def.SessionData {
 	log.Printf("Parsing Telegram message")
 
-	var env SessionData
-	env.Type = TYPE_TELEGRAM
+	var env def.SessionData
+	env.Type = def.TYPE_TELEGRAM
 
 	var data TelegramRequest
 	err := json.Unmarshal(body, &data)
@@ -129,11 +131,11 @@ func TelegramTranslate(body []byte) SessionData {
 
 // Translate to Telegram
 
-func HasOptions(env SessionData) bool {
+func HasOptions(env def.SessionData) bool {
 	return len(env.Res.Affordances.Options) > 0 || env.Res.Affordances.Remove
 }
 
-func PrepTelegramMessage(base TelegramPost, env SessionData) []byte {
+func PrepTelegramMessage(base TelegramPost, env def.SessionData) []byte {
 	var data []byte
 	var jsonErr error
 
@@ -184,7 +186,7 @@ func PrepTelegramMessage(base TelegramPost, env SessionData) []byte {
 	return data
 }
 
-func PostTelegram(env SessionData) bool {
+func PostTelegram(env def.SessionData) bool {
 	endpoint := "https://api.telegram.org/bot" + env.Secrets.TELEGRAM_ID + "/sendMessage"
 	header := "application/json;charset=utf-8"
 
@@ -194,7 +196,7 @@ func PostTelegram(env SessionData) bool {
 
 	var base TelegramPost
 	base.Id = env.User.Id
-	base.ParseMode = TELEGRAM_PARSE_MODE
+	base.ParseMode = def.TELEGRAM_PARSE_MODE
 	base.ReplyId = env.Msg.Id
 
 	for _, chunk := range chunks {
