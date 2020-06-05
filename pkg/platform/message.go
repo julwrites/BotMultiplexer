@@ -5,11 +5,11 @@ import (
 	"strings"
 )
 
-func Split(msg string, maxSize int) []string {
+func Split(msg string, delim string, maxSize int) []string {
 	var splits []string
 
 	msgStr := string(msg)
-	paragraphs := strings.SplitAfter(msgStr, "\n")
+	paragraphs := strings.SplitAfter(msgStr, delim)
 
 	var chunk string
 	for _, para := range paragraphs {
@@ -17,7 +17,7 @@ func Split(msg string, maxSize int) []string {
 			var group []string
 			group = append(group, chunk)
 			group = append(group, para)
-			chunk = strings.Join(group, "\n")
+			chunk = strings.Join(group, delim)
 		} else {
 			splits = append(splits, chunk)
 			chunk = para

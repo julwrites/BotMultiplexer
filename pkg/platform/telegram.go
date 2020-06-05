@@ -192,7 +192,7 @@ func PostTelegram(env def.SessionData) bool {
 
 	text := Format(env.Res.Message, TelegramNormal, TelegramBold, TelegramItalics, TelegramSuperscript)
 
-	chunks := Split(text, 4000)
+	chunks := Split(text, "\n", 4000)
 
 	var base TelegramPost
 	base.Id = env.User.Id

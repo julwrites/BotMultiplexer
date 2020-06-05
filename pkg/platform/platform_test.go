@@ -1,52 +1,35 @@
 package platform
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 // Message tests
 func TestSplit(t *testing.T) {
-	chunks := Split("This is a block of text that has been delimited by spaces and nothing else", 20)
+	chunks := Split("This is a block of text that has been delimited by spaces only", " ", 20)
 
 	if len(chunks) != 4 {
-		t.Errorf("Failed TestSplit multiple chunks scenario")
+		t.Errorf(fmt.Sprintf("Failed TestSplit multiple chunks scenario, got %d instead of 4", len(chunks)))
 	}
 
-	mono := Split("This is a block of text that has been delimited by spaces and nothing else", 80)
+	mono := Split("This is a block of text that has been delimited by spaces and nothing else", " ", 100)
 
 	if len(mono) != 1 {
 		t.Errorf("Failed TestSplit single chunk scenario")
 	}
 }
 
-// type NormalFormatter func(string) string
-// type BoldFormatter func(string) string
-// type ItalicsFormatter func(string) string
-// type SuperscriptFormatter func(string) string
-
-// type FormatType string
-
-// const (
-// 	Bold        FormatType = "*"
-// 	Italics     FormatType = "_"
-// 	Superscript FormatType = "^"
-// 	Null        FormatType = "0"
-// )
-
-// type FormatBlock struct {
-// 	Start int
-// 	End   int
-// 	Type  FormatType
-// }
-
 func TestNextFormatBlock(t *testing.T) {
 	italics := NextFormatBlock(" _Italics_ *Bold* ^1234^ Text", 0)
 
-	if italics.Type == Italics {
+	if italics.Type != Italics {
 		t.Errorf("Failed TestNextFormatBlock italics format blocks scenario")
 	}
 
 	bold := NextFormatBlock(" _Italics_ *Bold* ^1234^ Text", 10)
 
-	if bold.Type == Bold {
+	if bold.Type != Bold {
 		t.Errorf("Failed TestNextFormatBlock bold format blocks scenario")
 	}
 
