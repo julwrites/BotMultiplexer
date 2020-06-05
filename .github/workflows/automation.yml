@@ -13,4 +13,4 @@ jobs:
         run: |
           go get -v github.com/julwrites/BotMultiplexer
           ls -al
-          go test github.com/julwrites/BotMultiplexer/pkg/api 
+          go test github.com/julwrites/BotMultiplexer/pkg/platform

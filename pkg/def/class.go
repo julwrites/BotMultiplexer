@@ -1,6 +1,6 @@
 package def
 
-import botsecrets "github.com/julwrites/BotSecrets"
+import "github.com/julwrites/BotSecrets/pkg/secrets"
 
 // Struct definitions for bot
 
@@ -38,7 +38,7 @@ type ResponseData struct {
 }
 
 type SessionData struct {
-	Secrets botsecrets.SecretsData
+	Secrets secrets.SecretsData
 	Type    string
 	Channel string
 	User    UserData
