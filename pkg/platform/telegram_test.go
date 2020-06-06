@@ -54,3 +54,63 @@ func TestTelegramTranslate(t *testing.T) {
 		t.Errorf("Failed TestTelegramTranslate, User Username is wrong")
 	}
 }
+
+func TestPrepTelegramMessage(t *testing.T) {
+	var post TelegramPost
+
+	post.Text = "Text"
+	post.ParseMode = def.TELEGRAM_PARSE_MODE
+	post.Id = "1234"
+	post.ReplyId = "4567"
+
+	{
+		var env def.SessionData
+		env.Res.Affordances.Remove = true
+
+		data := PrepTelegramMessage(post, env)
+		var remove TelegramRemovePost
+		error := json.Unmarshal(data, &remove)
+
+		if error != nil {
+			t.Errorf("Failed TestPrepTelegramMessage RemovePost unmarshal JSON")
+		}
+		if remove.Markup.Remove != true {
+			t.Errorf("Failed TestPrepTelegramMessage RemovePost")
+		}
+	}
+	{
+		var env def.SessionData
+		var options []def.Option
+		options = append(options, def.Option{Link: "Link1", Text: "OptionText1"})
+		options = append(options, def.Option{Link: "Link2", Text: "OptionText2"})
+		options = append(options, def.Option{Link: "Link3", Text: "OptionText3"})
+		env.Res.Affordances.Options = options
+
+		{
+			data := PrepTelegramMessage(post, env)
+			var reply TelegramReplyPost
+			error := json.Unmarshal(data, &reply)
+
+			if error != nil {
+				t.Errorf("Failed TestPrepTelegramMessage ReplyPost unmarshal JSON")
+			}
+			if len(reply.Markup.Keyboard) == 0 {
+				t.Errorf("Failed TestPrepTelegramMessage ReplyPost keyboard options")
+			}
+		}
+		{
+			env.Res.Affordances.Inline = true
+
+			data := PrepTelegramMessage(post, env)
+			var inline TelegramInlinePost
+			error := json.Unmarshal(data, &inline)
+
+			if error != nil {
+				t.Errorf("Failed TestPrepTelegramMessage InlinePost unmarshal JSON")
+			}
+			if len(inline.Markup.Keyboard) == 0 {
+				t.Errorf("Failed TestPrepTelegramMessage InlinePost keyboard options")
+			}
+		}
+	}
+}
