@@ -20,7 +20,7 @@ type TelegramSender struct {
 	Firstname string `json:"first_name"`
 	Lastname  string `json:"last_name"`
 	Username  string `json:"username"`
-	Language  string `json:"langauge_code"`
+	Language  string `json:"language_code"`
 }
 
 type TelegramChat struct {
@@ -116,8 +116,8 @@ func TelegramTranslate(body []byte) def.SessionData {
 
 	tokens := strings.Split(data.Message.Text, " ")
 	if strings.Index(tokens[0], "/") == 0 {
-		env.Msg.Command = string((tokens[0])[1:])                                // Get the first token and strip off the prefix
-		data.Message.Text = strings.Replace(data.Message.Text, tokens[0], "", 1) // Replace the command
+		env.Msg.Command = string((tokens[0])[1:])                                                   // Get the first token and strip off the prefix
+		data.Message.Text = strings.Trim(strings.Replace(data.Message.Text, tokens[0], "", 1), " ") // Replace the command
 	}
 	env.Msg.Message = data.Message.Text
 	env.Msg.Id = strconv.Itoa(data.Message.Id)
@@ -190,7 +190,7 @@ func PostTelegram(env def.SessionData) bool {
 	endpoint := "https://api.telegram.org/bot" + env.Secrets.TELEGRAM_ID + "/sendMessage"
 	header := "application/json;charset=utf-8"
 
-	text := Format(env.Res.Message, TelegramNormal, TelegramBold, TelegramItalics, TelegramSuperscript)
+	text := Format(env.Res.Message, TelegramPreprocessing, TelegramBold, TelegramItalics, TelegramSuperscript)
 
 	chunks := Split(text, "\n", 4000)
 
@@ -218,7 +218,7 @@ func PostTelegram(env def.SessionData) bool {
 
 // Formatting methods
 
-func TelegramNormal(str string) string {
+func TelegramPreprocessing(str string) string {
 	str = strings.ReplaceAll(str, "[", "\\[")
 	str = strings.ReplaceAll(str, "]", "\\]")
 	str = strings.ReplaceAll(str, "(", "\\(")

@@ -31,7 +31,7 @@ func Split(msg string, delim string, maxSize int) []string {
 	return splits
 }
 
-type NormalFormatter func(string) string
+type PreprocessingFormatter func(string) string
 type BoldFormatter func(string) string
 type ItalicsFormatter func(string) string
 type SuperscriptFormatter func(string) string
@@ -90,10 +90,10 @@ func NextFormatBlock(str string, offset int) FormatBlock {
 	return block
 }
 
-func Format(str string, normal NormalFormatter, bold BoldFormatter, ita ItalicsFormatter, sup SuperscriptFormatter) string {
+func Format(str string, preprocess PreprocessingFormatter, bold BoldFormatter, ita ItalicsFormatter, sup SuperscriptFormatter) string {
 	var outStr string
 
-	str = normal(str)
+	str = preprocess(str)
 
 	pos := 0
 	for true {

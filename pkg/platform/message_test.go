@@ -46,40 +46,24 @@ func TestNextFormatBlock(t *testing.T) {
 	}
 }
 
-// func Format(str string, normal NormalFormatter, bold BoldFormatter, ita ItalicsFormatter, sup SuperscriptFormatter) string {
-// 	var outStr string
+func TestFormat(t *testing.T) {
+	normal := func(s string) string { return s }
+	bold := func(s string) string { return "Bold" }
+	italics := func(s string) string { return "Italics" }
+	super := func(s string) string { return "Superscript" }
 
-// 	str = normal(str)
+	{
+		output := Format("_Italics_ *Bold* ^1234^ Text", normal, bold, italics, super)
 
-// 	pos := 0
-// 	for true {
-// 		block := NextFormatBlock(str, pos)
-// 		if block.Type == Null {
-// 			break
-// 		}
+		if output != "Italics Bold Superscript Text" {
+			t.Errorf(fmt.Sprintf("Failed TestFormat basic test, got %s", output))
+		}
+	}
+	{
+		output := Format("_Italics_ *Boldbold**Bold* _Ita_ ^1234^ Text^Super^Normal", normal, bold, italics, super)
 
-// 		outStr = outStr + str[pos:block.Start]   // Add any text before the formatter
-// 		fmtStr := str[block.Start+1 : block.End] // Ignore the symbols
-
-// 		switch block.Type {
-// 		case Bold:
-// 			fmtStr = bold(fmtStr)
-// 			break
-// 		case Italics:
-// 			fmtStr = ita(fmtStr)
-// 			break
-// 		case Superscript:
-// 			fmtStr = sup(fmtStr)
-// 			break
-// 		}
-
-// 		outStr = outStr + fmtStr
-
-// 		pos = block.End + 1
-// 	}
-
-// 	// Any leftovers
-// 	outStr = outStr + str[pos:]
-
-// 	return outStr
-// }
+		if output != "Italics BoldBold Italics Superscript TextSuperscriptNormal" {
+			t.Errorf(fmt.Sprintf("Failed TestFormat compound test, got %s", output))
+		}
+	}
+}
