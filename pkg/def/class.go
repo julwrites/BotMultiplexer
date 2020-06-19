@@ -1,6 +1,6 @@
 package def
 
-import "github.com/julwrites/BotSecrets/pkg/secrets"
+import "github.com/julwrites/BotPlatform/pkg/secrets"
 
 // Struct definitions for bot
 
