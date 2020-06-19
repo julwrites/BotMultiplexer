@@ -119,7 +119,7 @@ func TelegramTranslate(body []byte) def.SessionData {
 		env.Msg.Command = string((tokens[0])[1:])                                                   // Get the first token and strip off the prefix
 		data.Message.Text = strings.Trim(strings.Replace(data.Message.Text, tokens[0], "", 1), " ") // Replace the command
 	}
-	env.Msg.Message = data.Message.Text
+	env.Msg.Message = strings.Trim(data.Message.Text, " \n\t")
 	env.Msg.Id = strconv.Itoa(data.Message.Id)
 
 	env.Channel = strconv.Itoa(data.Message.Chat.Id)
