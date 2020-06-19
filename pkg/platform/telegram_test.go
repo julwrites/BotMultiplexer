@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/julwrites/BotMultiplexer/pkg/def"
+	"github.com/julwrites/BotPlatform/pkg/def"
 )
 
 func GenerateTestData() []byte {

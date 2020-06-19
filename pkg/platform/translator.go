@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/julwrites/BotMultiplexer/pkg/def"
+	"github.com/julwrites/BotPlatform/pkg/def"
 )
 
 // Translator component to handle translation of a HTTP payload into a

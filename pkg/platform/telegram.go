@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/julwrites/BotMultiplexer/pkg/def"
+	"github.com/julwrites/BotPlatform/pkg/def"
 )
 
 // Classes
