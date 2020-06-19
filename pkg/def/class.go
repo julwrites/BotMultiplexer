@@ -38,10 +38,11 @@ type ResponseData struct {
 }
 
 type SessionData struct {
-	Secrets secrets.SecretsData
-	Type    string
-	Channel string
-	User    UserData
-	Msg     MessageData
-	Res     ResponseData
+	Secrets      secrets.SecretsData
+	Type         string
+	Channel      string
+	User         UserData
+	Msg          MessageData
+	Res          ResponseData
+	ResourcePath string
 }
