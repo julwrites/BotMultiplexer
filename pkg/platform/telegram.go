@@ -230,7 +230,7 @@ func PostTelegram(env def.SessionData) bool {
 			return false
 		}
 
-		log.Printf("Posted message, response %v", res)
+		log.Printf("Posted message %s, response %v", buffer, res)
 	}
 
 	return true
