@@ -135,6 +135,37 @@ func HasOptions(env def.SessionData) bool {
 	return len(env.Res.Affordances.Options) > 0 || env.Res.Affordances.Remove
 }
 
+func PrepTelegramInlineKeyboard(options []def.Option) [][]InlineButton {
+	var buttons [][]InlineButton
+	var buttonRow []InlineButton
+	x := 0
+	for i := 0; i < len(options); i++ {
+		buttonRow = append(buttonRow, InlineButton{options[i].Text, options[i].Link})
+		x++
+		if x == def.KEYBOARD_WIDTH {
+			buttons = append(buttons, buttonRow)
+		}
+	}
+
+	return buttons
+}
+
+func PrepTelegramKeyboard(options []def.Option) [][]KeyButton {
+	var buttons [][]KeyButton
+	var buttonRow []KeyButton
+	x := 0
+	for i := 0; i < len(options); i++ {
+		buttonRow = append(buttonRow, KeyButton{options[i].Text})
+		x++
+		if x == def.KEYBOARD_WIDTH {
+			buttons = append(buttons, buttonRow)
+			x = 0
+		}
+	}
+
+	return buttons
+}
+
 func PrepTelegramMessage(base TelegramPost, env def.SessionData) []byte {
 	var data []byte
 	var jsonErr error
@@ -149,24 +180,16 @@ func PrepTelegramMessage(base TelegramPost, env def.SessionData) []byte {
 			log.Printf("Post with Affordance Removal command")
 		} else if len(env.Res.Affordances.Options) > 0 {
 			if env.Res.Affordances.Inline {
-				var buttons []InlineButton
-				for i := 0; i < len(env.Res.Affordances.Options); i++ {
-					buttons = append(buttons, InlineButton{env.Res.Affordances.Options[i].Text, env.Res.Affordances.Options[i].Link})
-				}
 				var markup InlineMarkup
-				markup.Keyboard = append([][]InlineButton{}, buttons)
+				markup.Keyboard = PrepTelegramInlineKeyboard(env.Res.Affordances.Options)
 				var message TelegramInlinePost
 				message.TelegramPost = base
 				message.Markup = markup
 				data, jsonErr = json.Marshal(message)
 				log.Printf("Post with Inline Affordance command")
 			} else {
-				var buttons []KeyButton
-				for i := 0; i < len(env.Res.Affordances.Options); i++ {
-					buttons = append(buttons, KeyButton{env.Res.Affordances.Options[i].Text})
-				}
 				var markup ReplyMarkup
-				markup.Keyboard = append([][]KeyButton{}, buttons)
+				markup.Keyboard = PrepTelegramKeyboard(env.Res.Affordances.Options)
 				var message TelegramReplyPost
 				message.TelegramPost = base
 				message.Markup = markup
