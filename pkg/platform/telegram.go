@@ -138,14 +138,11 @@ func HasOptions(env def.SessionData) bool {
 func PrepTelegramInlineKeyboard(options []def.Option) [][]InlineButton {
 	var buttons [][]InlineButton
 	var buttonRow []InlineButton
-	x := 0
 	for i := 0; i < len(options); i++ {
-		buttonRow = append(buttonRow, InlineButton{options[i].Text, options[i].Link})
-		x++
-		if x == def.KEYBOARD_WIDTH {
+		buttonRow = append(buttonRow, InlineButton{Text: options[i].Text, Url: options[i].Link})
+		if i%def.KEYBOARD_WIDTH == 0 {
 			buttons = append(buttons, buttonRow)
 			buttonRow = []InlineButton{}
-			x = 0
 		}
 	}
 
@@ -155,14 +152,11 @@ func PrepTelegramInlineKeyboard(options []def.Option) [][]InlineButton {
 func PrepTelegramKeyboard(options []def.Option) [][]KeyButton {
 	var buttons [][]KeyButton
 	var buttonRow []KeyButton
-	x := 0
 	for i := 0; i < len(options); i++ {
-		buttonRow = append(buttonRow, KeyButton{options[i].Text})
-		x++
-		if x == def.KEYBOARD_WIDTH {
+		buttonRow = append(buttonRow, KeyButton{Text: options[i].Text})
+		if i%def.KEYBOARD_WIDTH == 0 {
 			buttons = append(buttons, buttonRow)
 			buttonRow = []KeyButton{}
-			x = 0
 		}
 	}
 
@@ -236,7 +230,7 @@ func PostTelegram(env def.SessionData) bool {
 			return false
 		}
 
-		log.Printf("Posted message, response %v", res)
+		log.Printf("Posted message %s, response %v", buffer, res)
 	}
 
 	return true
