@@ -144,6 +144,8 @@ func PrepTelegramInlineKeyboard(options []def.Option) [][]InlineButton {
 		x++
 		if x == def.KEYBOARD_WIDTH {
 			buttons = append(buttons, buttonRow)
+			buttonRow = []InlineButton{}
+			x = 0
 		}
 	}
 
@@ -159,6 +161,7 @@ func PrepTelegramKeyboard(options []def.Option) [][]KeyButton {
 		x++
 		if x == def.KEYBOARD_WIDTH {
 			buttons = append(buttons, buttonRow)
+			buttonRow = []KeyButton{}
 			x = 0
 		}
 	}
