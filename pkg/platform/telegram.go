@@ -231,14 +231,6 @@ func PostTelegram(env def.SessionData) bool {
 	base.ParseMode = def.TELEGRAM_PARSE_MODE
 	base.ReplyId = env.Msg.Id
 
-	// If we need to both remove and set a keyboard
-	if env.Res.Affordances.Remove && len(env.Res.Affordances.Options) > 0 {
-		base.Text = "Just a moment..."
-		data := PrepTelegramMessage(base, env)
-		PostTelegramMessage(data, env.Secrets.TELEGRAM_ID)
-		env.Res.Affordances.Remove = false
-	}
-
 	// After removing, everything else can continue as per normal
 	for _, chunk := range chunks {
 		base.Text = chunk
