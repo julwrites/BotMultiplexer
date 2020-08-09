@@ -233,7 +233,7 @@ func PostTelegram(env def.SessionData) bool {
 
 	// If we need to both remove and set a keyboard
 	if env.Res.Affordances.Remove && len(env.Res.Affordances.Options) > 0 {
-		base.Text = ""
+		base.Text = "Just a moment..."
 		data := PrepTelegramMessage(base, env)
 		PostTelegramMessage(data, env.Secrets.TELEGRAM_ID)
 	}
