@@ -217,7 +217,7 @@ func PostTelegramMessage(data []byte, telegramId string) bool {
 		return false
 	}
 
-	log.Printf("Posted message %s, response %v", buffer, res)
+	log.Printf("Posted message %s, response %v", string(data), res)
 	return true
 }
 
