@@ -50,8 +50,10 @@ type TelegramPost struct {
 }
 
 type InlineButton struct {
-	Text string `json:"text"`
-	Url  string `json:"url"`
+	Text     string `json:"text"`
+	Url      string `json:"url"`
+	Callback string `json:"callback_data"`
+	Query    string `json:"switch_inline_query"`
 }
 
 type InlineMarkup struct {
@@ -138,14 +140,11 @@ func HasOptions(env def.SessionData) bool {
 func PrepTelegramInlineKeyboard(options []def.Option) [][]InlineButton {
 	var buttons [][]InlineButton
 	var buttonRow []InlineButton
-	x := 0
 	for i := 0; i < len(options); i++ {
-		buttonRow = append(buttonRow, InlineButton{options[i].Text, options[i].Link})
-		x++
-		if x == def.KEYBOARD_WIDTH {
+		buttonRow = append(buttonRow, InlineButton{Text: options[i].Text, Url: options[i].Link})
+		if i%def.KEYBOARD_WIDTH == 0 {
 			buttons = append(buttons, buttonRow)
 			buttonRow = []InlineButton{}
-			x = 0
 		}
 	}
 
@@ -155,14 +154,11 @@ func PrepTelegramInlineKeyboard(options []def.Option) [][]InlineButton {
 func PrepTelegramKeyboard(options []def.Option) [][]KeyButton {
 	var buttons [][]KeyButton
 	var buttonRow []KeyButton
-	x := 0
 	for i := 0; i < len(options); i++ {
-		buttonRow = append(buttonRow, KeyButton{options[i].Text})
-		x++
-		if x == def.KEYBOARD_WIDTH {
+		buttonRow = append(buttonRow, KeyButton{Text: options[i].Text})
+		if i%def.KEYBOARD_WIDTH == 0 {
 			buttons = append(buttons, buttonRow)
 			buttonRow = []KeyButton{}
-			x = 0
 		}
 	}
 
