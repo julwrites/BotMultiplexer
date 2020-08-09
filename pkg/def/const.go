@@ -8,3 +8,5 @@ const TELEGRAM_PARSE_MODE = "MarkdownV2"
 
 const FIELD_USER = "USER"
 const FIELD_MESSAGE = "MESSAGE"
+
+const KEYBOARD_WIDTH = 1
