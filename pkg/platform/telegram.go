@@ -236,10 +236,10 @@ func PostTelegram(env def.SessionData) bool {
 		base.Text = "Just a moment..."
 		data := PrepTelegramMessage(base, env)
 		PostTelegramMessage(data, env.Secrets.TELEGRAM_ID)
+		env.Res.Affordances.Remove = false
 	}
 
 	// After removing, everything else can continue as per normal
-	env.Res.Affordances.Remove = false
 	for _, chunk := range chunks {
 		base.Text = chunk
 		data := PrepTelegramMessage(base, env)
