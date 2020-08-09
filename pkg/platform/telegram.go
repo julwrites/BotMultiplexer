@@ -50,10 +50,8 @@ type TelegramPost struct {
 }
 
 type InlineButton struct {
-	Text     string `json:"text"`
-	Url      string `json:"url"`
-	Callback string `json:"callback_data"`
-	Query    string `json:"switch_inline_query"`
+	Text string `json:"text"`
+	Url  string `json:"url"`
 }
 
 type InlineMarkup struct {
