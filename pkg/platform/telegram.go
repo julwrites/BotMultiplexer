@@ -206,10 +206,22 @@ func PrepTelegramMessage(base TelegramPost, env def.SessionData) []byte {
 	return data
 }
 
-func PostTelegram(env def.SessionData) bool {
-	endpoint := "https://api.telegram.org/bot" + env.Secrets.TELEGRAM_ID + "/sendMessage"
+func PostTelegramMessage(data []byte, telegramId string) bool {
+	endpoint := "https://api.telegram.org/bot" + telegramId + "/sendMessage"
 	header := "application/json;charset=utf-8"
 
+	buffer := bytes.NewBuffer(data)
+	res, postErr := http.Post(endpoint, header, buffer)
+	if postErr != nil {
+		log.Printf("Error occurred during post: %v", postErr)
+		return false
+	}
+
+	log.Printf("Posted message %s, response %v", buffer, res)
+	return true
+}
+
+func PostTelegram(env def.SessionData) bool {
 	text := Format(env.Res.Message, TelegramPreprocessing, TelegramBold, TelegramItalics, TelegramSuperscript)
 
 	chunks := Split(text, "\n", 4000)
@@ -219,18 +231,19 @@ func PostTelegram(env def.SessionData) bool {
 	base.ParseMode = def.TELEGRAM_PARSE_MODE
 	base.ReplyId = env.Msg.Id
 
+	// If we need to both remove and set a keyboard
+	if env.Res.Affordances.Remove && len(env.Res.Affordances.Options) > 0 {
+		base.Text = ""
+		data := PrepTelegramMessage(base, env)
+		PostTelegramMessage(data, env.Secrets.TELEGRAM_ID)
+	}
+
+	// After removing, everything else can continue as per normal
+	env.Res.Affordances.Remove = false
 	for _, chunk := range chunks {
 		base.Text = chunk
 		data := PrepTelegramMessage(base, env)
-
-		buffer := bytes.NewBuffer(data)
-		res, postErr := http.Post(endpoint, header, buffer)
-		if postErr != nil {
-			log.Printf("Error occurred during post: %v", postErr)
-			return false
-		}
-
-		log.Printf("Posted message %s, response %v", buffer, res)
+		PostTelegramMessage(data, env.Secrets.TELEGRAM_ID)
 	}
 
 	return true
