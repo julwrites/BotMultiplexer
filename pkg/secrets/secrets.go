@@ -9,10 +9,11 @@ import (
 
 // Secrets handling for bot
 
-func LoadSecrets(filePath string) SecretsData {
+func LoadSecrets(filePath string) (SecretsData, error) {
 	data, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		log.Printf("Error reading secrets: %v", err)
+		return SecretsData{}, err
 	}
 
 	// log.Printf("Raw Secrets: %s", strings.ReplaceAll(string(data), "\n", ""))
@@ -21,7 +22,8 @@ func LoadSecrets(filePath string) SecretsData {
 	err = yaml.Unmarshal([]byte(data), &env)
 	if err != nil {
 		log.Printf("Error unmarshaling secrets: %v", err)
+		return SecretsData{}, err
 	}
 
-	return env
+	return env, nil
 }
