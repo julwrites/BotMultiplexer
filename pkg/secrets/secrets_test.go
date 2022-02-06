@@ -13,6 +13,7 @@ func GenerateTestData() {
 	secrets.ADMIN_ID = "123456789"
 	secrets.TELEGRAM_ID = "Telegram ID"
 	secrets.PROJECT_ID = "Project ID"
+	secrets.BUCKET_ID = "Bucket ID"
 
 	data, _ := yaml.Marshal(secrets)
 
@@ -22,7 +23,10 @@ func GenerateTestData() {
 func TestLoadSecrets(t *testing.T) {
 	GenerateTestData()
 
-	data := LoadSecrets("test.yaml")
+	data, err := LoadSecrets("test.yaml")
+	if err != nil {
+		t.Errorf("Failed to load secrets")
+	}
 
 	if data.PROJECT_ID != "Project ID" {
 		t.Errorf("Failed to load Project ID")
@@ -34,5 +38,9 @@ func TestLoadSecrets(t *testing.T) {
 
 	if data.TELEGRAM_ID != "Telegram ID" {
 		t.Errorf("Failed to load Telegram ID")
+	}
+
+	if data.BUCKET_ID != "Bucket ID" {
+		t.Errorf("Failed to load Bucket ID")
 	}
 }
