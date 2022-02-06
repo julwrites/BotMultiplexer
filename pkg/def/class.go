@@ -5,13 +5,13 @@ import "github.com/julwrites/BotPlatform/pkg/secrets"
 // Struct definitions for bot
 
 type UserData struct {
-	Firstname string `firestore:"first_name"`
-	Lastname  string `firestore:"last_name"`
-	Username  string `firestore:"user_name"`
-	Id        string `firestore:"id"`
-	Type      string `firestore:"type"`   // Group/Individual
-	Action    string `firestore:"action"` // Current action if any
-	Config    string `firestore:"config"`
+	Firstname string `datastore:""`
+	Lastname  string `datastore:""`
+	Username  string `datastore:""`
+	Id        string `datastore:""`
+	Type      string `datastore:""` // Group/Individual
+	Action    string `datastore:""` // Current action if any
+	Config    string `datastore:""`
 }
 
 type MessageData struct {
